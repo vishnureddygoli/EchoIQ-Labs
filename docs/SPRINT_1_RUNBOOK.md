@@ -36,7 +36,7 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. If the API is unavailable, the dashboard may show demo fallback data, but the UI must clearly display an `API unavailable. Showing demo fallback data.` warning banner so fallback data is never mistaken for live metrics.
 
 ## Test curl commands
 

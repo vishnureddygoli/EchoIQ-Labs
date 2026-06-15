@@ -1,5 +1,6 @@
 from typing import Any
 from uuid import UUID
+from psycopg.types.json import Jsonb
 from app.core.config import get_settings
 from app.core.database import get_connection, fetch_all, fetch_one
 from app.core.redis_client import enqueue_call
@@ -52,7 +53,7 @@ def create_lead(payload: LeadCreate) -> LeadResponse:
                  normalized.state, normalized.city, normalized.language_preference, normalized.source_platform,
                  normalized.campaign_name, normalized.ad_id, normalized.form_id, normalized.landing_page_url,
                  normalized.offer_name, normalized.consent_status, normalized.opt_out_status, duplicate_status,
-                 compliance_status, compliance_reason, normalized.raw_payload),
+                 compliance_status, compliance_reason, Jsonb(normalized.raw_payload)),
             )
             lead_id = cur.fetchone()["id"]
             cur.execute("INSERT INTO lead_scores (lead_id, score, lead_temperature, reason) VALUES (%s,%s,%s,%s)", (lead_id, score, temperature, score_reason))

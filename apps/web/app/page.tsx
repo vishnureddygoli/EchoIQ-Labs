@@ -5,11 +5,14 @@ export default async function Page() {
   const cards = [
     ['Total leads', metrics.total_leads],
     ['Queued calls', metrics.queued_calls],
-    ['Hot leads', metrics.hot_leads],
+    ['Qualified leads', metrics.hot_leads],
     ['New leads', metrics.new_leads],
   ];
   return <main style={{ fontFamily: 'sans-serif', padding: 32 }}>
     <h1>EchoIQ Labs Revenue Recovery</h1>
+    {!metrics.api_available && <div role="alert" style={{ background: '#fff3cd', border: '1px solid #ffe69c', borderRadius: 8, color: '#664d03', marginBottom: 16, padding: 12 }}>
+      <strong>API unavailable. Showing demo fallback data.</strong>{metrics.error_message ? ` ${metrics.error_message}` : ''}
+    </div>}
     <section style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(140px, 1fr))', gap: 16 }}>
       {cards.map(([label, value]) => <div key={label} style={{ border: '1px solid #ddd', padding: 16, borderRadius: 8 }}><p>{label}</p><strong style={{ fontSize: 28 }}>{value}</strong></div>)}
     </section>
