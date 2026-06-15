@@ -1,0 +1,12 @@
+{
+  "name": "John Miller",
+  "phone": "+15125550123",
+  "email": "john@example.com",
+  "country": "USA",
+  "city": "Austin",
+  "language_preference": "english",
+  "source_platform": "website",
+  "campaign_name": "Storm Damage Roof Inspection",
+  "offer_name": "Free roof inspection",
+  "consent_status": "provided"
+}
