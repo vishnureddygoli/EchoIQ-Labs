@@ -19,7 +19,7 @@ export default async function Page() {
     <h2>Recent leads</h2>
     <table cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead><tr><th align="left">Name</th><th align="left">Phone</th><th align="left">City</th><th align="left">Source</th><th align="left">Status</th><th align="left">Score</th></tr></thead>
-      <tbody>{metrics.recent_leads.map((lead) => <tr key={lead.id} style={{ borderTop: '1px solid #eee' }}><td>{lead.name || '—'}</td><td>{lead.phone}</td><td>{lead.city || '—'}</td><td>{lead.source_platform}</td><td>{lead.compliance_status}</td><td>{lead.score ?? '—'}</td></tr>)}</tbody>
+      <tbody>{metrics.recent_leads.map((lead) => <tr key={lead.id} style={{ borderTop: '1px solid #eee' }}><td>{lead.name || '—'}</td><td suppressHydrationWarning>{String(lead.phone || '')}</td><td>{lead.city || '—'}</td><td>{lead.source_platform}</td><td>{lead.compliance_status}</td><td>{lead.score ?? '—'}</td></tr>)}</tbody>
     </table>
   </main>;
 }
