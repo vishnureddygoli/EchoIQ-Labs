@@ -7,7 +7,7 @@ from app.schemas.lead import LeadCreate, LeadResponse
 from app.services.call_dispatch_service import create_call_payload
 from app.services.compliance_service import check_compliance
 from app.services.duplicate_service import detect_duplicate
-from app.services.normalization_service import detect_country_from_phone, normalize_language, normalize_phone, validate_source_platform
+from app.services.normalization_service import normalize_country, normalize_language, normalize_phone, validate_source_platform
 from app.services.scoring_service import initial_score
 
 
@@ -28,7 +28,7 @@ def create_lead(payload: LeadCreate) -> LeadResponse:
     phone = normalize_phone(payload.phone)
     source = validate_source_platform(payload.source_platform)
     language = normalize_language(payload.language_preference)
-    country = payload.country or detect_country_from_phone(phone)
+    country = normalize_country(payload.country, phone, get_settings().default_client_country)
     normalized = payload.model_copy(update={"phone": phone, "source_platform": source, "language_preference": language, "country": country})
     is_compliant, compliance_reason = check_compliance(normalized)
     compliance_status = "callable" if is_compliant else "blocked"
@@ -61,8 +61,13 @@ def create_lead(payload: LeadCreate) -> LeadResponse:
                 call_attempt_id = cur.fetchone()["id"]
         conn.commit()
     if call_attempt_id and get_settings().mock_calling_enabled:
-        enqueue_call(create_call_payload(lead_id=lead_id, call_attempt_id=call_attempt_id, phone=phone or "", language=language, country=country, source=source))
-        queued = True
+        try:
+            enqueue_call(create_call_payload(lead_id=lead_id, call_attempt_id=call_attempt_id, phone=phone or "", language=language, country=country, source=source))
+            queued = True
+        except Exception:
+            # Keep the accepted lead durable even when Redis is temporarily unavailable;
+            # the call_attempt remains queued for operational retry.
+            queued = False
     return LeadResponse(lead_id=lead_id, call_attempt_id=call_attempt_id, duplicate_status=duplicate_status, compliance_status=compliance_status, compliance_reason=compliance_reason, score=score, lead_temperature=temperature, queued=queued)
 
 def list_leads(limit: int = 50) -> list[dict[str, Any]]:

@@ -1,11 +1,24 @@
 import json
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 from redis import Redis
 import psycopg
 from psycopg.rows import dict_row
 
 QUEUE_NAME = "echoiq:outbound_calls"
+ROOT_ENV = Path(__file__).resolve().parents[3] / ".env"
+
+def _load_root_env() -> None:
+    if not ROOT_ENV.exists():
+        return
+    for line in ROOT_ENV.read_text().splitlines():
+        if not line or line.lstrip().startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+_load_root_env()
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://echoiq:echoiq@localhost:5432/echoiq")
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
